@@ -94,7 +94,7 @@
                             +  '<td>${ {{model['field']}} }</td>'
                             {% end %}{% end %}
                             +  '<td><a href="/{{model_name}}s/edit/${ f_id }">编辑</a></td>'
-                            +  '<td><a href="javascript:void(0);" onclick="remove_{{model_name}}_body(this)" id="id-${ f_id }" href="#">删除</a></td>'
+                            +  '<td><a href="javascript:void(0);" onclick="remove_{{model_name}}(this)" id="id-${ f_id }" href="#">删除</a></td>'
                             +'</tr>';
               $.tmpl(tmpl_str, items).appendTo('#{{model_name}}_body');
             }
