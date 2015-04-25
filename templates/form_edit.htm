@@ -1,0 +1,51 @@
+{% autoescape None %}
+<form class="form-horizontal" role="form" method="post" enctype="multipart/form-data" action="/hotel/new" onsubmit="return checkForm()">
+{% for model in model_list %}
+ {% if model['element'] == 'text' %}
+  <div class="form-group">
+    <label for="{{model['field'][2:]}}" class="col-sm-2 control-label">{{model['placeholder']}}</label>
+    <div class="col-sm-6">
+      <input type="text" class="form-control" value="{{prev}}{{model_name}}.{{model['field']}}{{next}}" id="{{model['field'][2:]}}" name="{{model['field'][2:]}}" placeholder="输入{{model['placeholder']}}（必填）">
+    </div>
+  </div>
+  {% elif model['element'] == 'radio' %}
+  <div class="form-group">
+    <label class="col-sm-2 control-label">{{model['placeholder']}}</label>
+    <div class="col-sm-6">
+      {% for i in xrange(len(model['value_array'])) %}
+      <label class="radio-inline">
+        <input type="radio" name="{{model['field'][2:]}}" value="{{model['value_array'][i]}}" {{prev}}'checked' if {{model_name}}.{{model['field']}} == {{ "'" + str(model['default']) + "'" if model['type'] == 'str' else int(model['default']) }} else ''{{next}}> {{model['desc_array'][i]}}
+      </label>
+      {% end %}
+    </div>
+  </div>
+  {% elif model['element'] == 'select' %}
+  <div class="form-group">
+    <label for="{{model['field'][2:]}}" class="col-sm-2 control-label">{{model['placeholder']}}</label>
+    <div class="col-sm-6">
+      <select class="form-control" id="{{model['field'][2:]}}" name="{{model['field'][2:]}}">
+        {% for i in xrange(len(model['value_array'])) %}
+        <option value="{{model['value_array'][i]}}"  {{prev}}'selected="selected"' if {{model_name}}.{{model['field']}} == {{ "'" + str(model['default']) + "'" if model['type'] == 'str' else int(model['default']) }} else ''{{next}}>{{model['desc_array'][i]}}</option>
+        {% end %}
+      </select>
+    </div>
+  </div>
+  {% elif model['element'] == 'checkbox' %}
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-6 form-inline">
+      <label class="control-label">{{model['placeholder']}}</label>
+      {% for i in xrange(len(model['value_array'])) %}
+      <label class="checkbox-inline">
+        <input type="checkbox" name="{{model['field'][2:]}}" value="{{model['value_array'][i]}}" {{prev}}'checked' if {{model_name}}.{{model['field']}} in {{model['default']}} else ''{{next}}> {{model['desc_array'][i]}}
+      </label>
+      {% end %}
+    </div>
+  </div>
+  {% end %}
+{% end %}
+  <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-6">
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+  </div>
+</form>
