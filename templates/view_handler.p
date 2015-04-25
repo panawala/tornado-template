@@ -2,8 +2,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2015 xmonster.cn. All rights reserved.
-#
 
 import logging
 import time
@@ -95,7 +93,6 @@ class Inner{{model_name_upper}}sHandler(InnerAPIHandler):
     @tornado.web.authenticated
     def delete(self):
         {{model_name}}_id = self.get_argument("id")
-        {{model_name}}_id = self.{{model_name}}_model.remove_{{model_name}}({{model_name}}_id)
-        result = {'ret': '0', 'msg': '', 'data': {'result': {{model_name}}_id}}
+        result = self.{{model_name}}_model.remove_{{model_name}}({{model_name}}_id)
         self.finish(result)
 

@@ -1,11 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 #
-# Copyright (c) 2015 xmonster.cn. All rights reserved.
-#
-import os
-
-from tornado import template
+from tpl_engine import generate_model_view_handler
 
 model_list = [
     {
@@ -27,7 +23,7 @@ model_list = [
         'required': True,
         'type': 'str'
     }, {
-        'field': 'f_is_show',
+        'field': 'f_fee_type',
         'element': 'radio',
         'label': u'类型',
         'type': 'int',
@@ -39,7 +35,7 @@ model_list = [
         'required': False,
         'default': 2,
     }, {
-        'field': 'f_is_show1',
+        'field': 'f_fee_type1',
         'element': 'radio',
         'label': u'类型1',
         'type': 'str',
@@ -62,7 +58,7 @@ model_list = [
         ],
         'required': False,
         'default': 'self',
-    },{
+    }, {
         'field': 'f_supplier1',
         'element': 'select',
         'label': u'供应商1',
@@ -94,45 +90,5 @@ model_list = [
 ]
 
 
-tpl_suffixes = {
-    'html': ['.htm', 'l'],
-    'handler': ['.p', 'y'],
-    'model': ['.p', 'y'],
-}
-
-
-def __generate_template(tpl_file, arg_model_list, tpl_type="html"):
-    loader = template.Loader("templates")
-    build_path = "build"
-    build_path_exists = os.path.exists(build_path)
-    print(build_path_exists)
-    if not build_path_exists:
-        os.mkdir(build_path)
-
-    input_tpl_file = tpl_file + tpl_suffixes[tpl_type][0]
-    view_template = loader.load(input_tpl_file)
-    template_result = view_template.generate(
-        model_list=arg_model_list,
-        model_name='topic',
-        model_name_upper='Topic',
-        prev="{{",
-        next="}}",
-        prev_per="{%",
-        next_per="%}",
-        escape=None,
-    )
-
-    output_file = open('/'.join([build_path, input_tpl_file + tpl_suffixes[tpl_type][1]]), 'w+')
-    output_file.write(template_result)
-    output_file.close()
-
-
-def generate_view(arg_model_list):
-    __generate_template('entries', arg_model_list, tpl_type='html')
-    __generate_template('form_edit', arg_model_list, tpl_type='html')
-    __generate_template('form_new', arg_model_list, tpl_type='html')
-    __generate_template('handler', arg_model_list, tpl_type='handler')
-    __generate_template('model', arg_model_list, tpl_type='model')
-
 if __name__ == '__main__':
-    generate_view(model_list)
+    generate_model_view_handler('topic', model_list, output_dir='build')
