@@ -1,0 +1,135 @@
+{{prev_per}} extends "base_admin.html" {{next_per}}
+
+{{prev_per}} block head {{next_per}}
+
+<style type="text/css">
+#page-changed-select{
+  width: 100px;
+  border: 1px solid #cccccc;
+  background-color: #ffffff;
+}
+</style>
+
+{{prev_per}} end {{next_per}}
+
+{{prev_per}} block body {{next_per}}
+    <div class="form-inline">
+        <a href="/{{model_name}}/new" class="btn btn-primary" role="button">创建新{{model_name}}</a>
+        <input type="text" class="form-control" oninput="get_{{model_name}}s()" id="search_str" name="search_str" placeholder="搜索...">
+    </div>
+	<table class="table table-condensed">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>描述</th>
+          <th>类型</th>
+          <th>开始时间</th>
+          <th>结束时间</th>
+          <th>编辑</th>
+          <th>删除</th>
+        </tr>
+      </thead>
+      <tbody id="{{model_name}}_body">
+      </tbody>
+    </table>
+
+
+    <div id="pager"></div>
+
+    <div>
+        Go to page:
+        <select id="page-changed-select">
+        </select>
+    </div>
+
+{{prev_per}} end {{next_per}}
+
+{{prev_per}} block bottom {{next_per}}
+    <script type="text/javascript" src="{{prev}} static_url("js/vendor/jquery.tmpl.min.js") {{next}}"></script>
+    <script type="text/javascript" src="{{prev}} static_url("js/bootstrap-paginator.js") {{next}}"></script>
+
+    <script type='text/javascript'>
+
+    var globalPage = 1;
+
+    (function initPage(page){
+      $.ajax({
+          url: '/innerapi/{{model_name}}s?page='+ page + '&pagesize=20&search_str=' + $('#search_str').val(),
+          type: 'GET',
+          data:{'_xsrf': getCookie("_xsrf")},
+          success: function(result) {
+            if(result.ret == 0){
+              var items = result.data.list;
+              var total = result.data.page.pages;
+              for(var i = 1; i < total + 1; i ++){
+                $('#page-changed-select').append('<option value="'+ i +'">'+ i +'</option>');
+              }
+
+              var options = {
+                  currentPage: 1,
+                  totalPages: total,
+                  onPageClicked: function(e,originalEvent,type,page){
+                      $('#alert-content').text("Page item clicked, type: "+type+" page: "+page);
+                      globalPage = page;
+                      get_{{model_name}}s();
+                  }
+              };
+              $('#pager').bootstrapPaginator(options);
+            }
+          }
+      });
+    })(1);
+
+    var get_{{model_name}}s = function(){
+      $.ajax({
+          url: '/innerapi/{{model_name}}s?page='+ globalPage + '&pagesize=20&search_str=' + $('#search_str').val(),
+          type: 'GET',
+          data:{},
+          success: function(result) {
+            if(result.ret == 0){
+              var items = result.data.list;
+              var total = result.data.page.pages;
+
+              $('#{{model_name}}_body').empty();
+              var tmpl_str = '<tr>'
+                            +  '<td>${ f_id }</td>'
+                            +  '<td>${ f_title }</td>'
+                            +  '<td>${ f_type }</td>'
+                            +  '<td>${ f_begin_date }</td>'
+                            +  '<td>${ f_end_date }</td>'
+                            +  '<td><a href="/{{model_name}}s/edit/${ f_id }">编辑</a></td>'
+                            +  '<td><a href="javascript:void(0);" onclick="remove_{{model_name}}_body(this)" id="id-${ f_id }" href="#">删除</a></td>'
+                            +'</tr>';
+              $.tmpl(tmpl_str, items).appendTo('#{{model_name}}_body');
+            }
+          }
+      });
+    };
+
+    $('#page-changed-select').change(function(){
+        console.log('happened');
+        globalPage = $(this).val();
+        $('#pager').bootstrapPaginator("show",globalPage);
+        get_{{model_name}}s();
+    });
+
+    var remove_{{model_name}} = function(that){
+      var result = confirm('确定要删除这个???')
+      if(!result){
+         return;
+      }
+      $.ajax({
+          url: '/innerapi/{{model_name}}s',
+          type: 'DELETE',
+          data:{'id': $(that).attr('id').split('-')[1],'_xsrf': getCookie("_xsrf") },
+          success: function(result) {
+            if(result.ret == 0){
+              location.href = location.href;
+            }
+          }
+      });
+    };
+
+    get_{{model_name}}s();
+    </script>
+{{prev_per}} end {{next_per}}

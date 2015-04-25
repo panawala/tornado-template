@@ -1,5 +1,6 @@
 {% autoescape None %}
-<form class="form-horizontal" role="form" method="post" enctype="multipart/form-data" action="/hotel/new" onsubmit="return checkForm()">
+<form class="form-horizontal" role="form" method="post" enctype="multipart/form-data" action="/{{model_name}}/new" onsubmit="return checkForm()">
+  <input type="hidden" name="id" value="0">
 {% for model in model_list %}
  {% if model['element'] == 'text' %}
   <div class="form-group">
