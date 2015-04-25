@@ -10,26 +10,24 @@ import time
 
 import tornado.web
 import tornado.auth
-from tornado import escape
 from handlers.base.admin_handler import ViewHandler, InnerAPIHandler
 
 from libs.exceptions import APIError
-from libs.uploader import upload
 from libs.validator import validate
-from libs.util import json_dumps
 
 
 class {{model_name_upper}}ViewHandler(ViewHandler):
     def get_{{model_name}}_from_arguments(self):
         fields = [
-        {% for model in model_list %}    {
+        {% for model in model_list %}{% if model['element'] != 'id' %}
+            {
                 'name': '{{model['field'][2:]}}',
                 'type': '{{model['type']}}',
                 'required': {{True if model['required'] else False}},
                 {% if not model['required'] %}'default': {{"'" + str(model['default']) + "'" if model['type'] == 'str' and model['element'] != 'checkbox' else model['default']}},{% end %}
-            },{% end %}
+            },
+        {% end %}{% end %}
         ]
-
 
         ret, params = validate(self.request.arguments, fields)
         logging.info(ret)
@@ -39,7 +37,12 @@ class {{model_name_upper}}ViewHandler(ViewHandler):
 
         return ret, params, {
         {% for model in model_list %}
+        {% if model['element'] != 'id' and model['element'] != 'checkbox' %}
             "{{model['field']}}": params['{{model['field'][2:]}}'],
+        {% end %}
+        {% if model['element'] == 'checkbox' %}
+            "{{model['field']}}": reduce(lambda x, y: x | y, map(lambda x: (1 << int(x)), params['{{model['field'][2:]}}']), 0),
+        {% end %}
         {% end %}
         }
 
@@ -51,9 +54,9 @@ class {{model_name_upper}}NewHandler({{model_name_upper}}ViewHandler):
 
     @tornado.web.authenticated
     def post(self):
-        ret, {{model_name}} = self.get_{{model_name}}_from_arguments()
+        ret, params, {{model_name}} = self.get_{{model_name}}_from_arguments()
         {{model_name}}["f_create_time"] = time.strftime('%Y-%m-%d %X', time.localtime())
-        self.{{model_name}}_model.upsert_{{model_name}}({{model_name}}, {{model_name}}['id'])
+        self.{{model_name}}_model.upsert_{{model_name}}({{model_name}}, params['id'])
         self.redirect("/{{model_name}}s")
         return
 
@@ -68,8 +71,8 @@ class {{model_name_upper}}EditHandler({{model_name_upper}}ViewHandler):
 
     @tornado.web.authenticated
     def post(self):
-        ret, {{model_name}} = self.get_{{model_name}}_from_arguments()
-        self.{{model_name}}_model.upsert_{{model_name}}({{model_name}}, {{model_name}}['id'])
+        ret, params, {{model_name}} = self.get_{{model_name}}_from_arguments()
+        self.{{model_name}}_model.upsert_{{model_name}}({{model_name}}, params['id'])
         self.redirect("/{{model_name}}s")
         return
 

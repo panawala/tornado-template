@@ -11,126 +11,110 @@ model_list = [
     {
         'field': 'f_id',
         'element': 'id',
-        'placeholder': 'ID',
+        'label': 'ID',
         'required': True,
         'type': 'int'
     }, {
+        'field': 'f_address',
+        'element': 'text',
+        'label': u'地址',
+        'required': True,
+        'type': 'str'
+    }, {
         'field': 'f_name',
         'element': 'text',
-        'placeholder': u'商品名称',
+        'label': u'商品名称',
         'required': True,
         'type': 'str'
     }, {
         'field': 'f_is_show',
         'element': 'radio',
-        'placeholder': u'类型',
+        'label': u'类型',
         'type': 'int',
-        'value_array': [1, 2, 3],
-        'desc_array': [u'收费', u'免费', u'优惠活动'],
+        'option_array': [
+            {'val': 1, 'desc': u'收费'},
+            {'val': 2, 'desc': u'免费'},
+            {'val': 3, 'desc': u'优惠活动'},
+        ],
         'required': False,
         'default': 2,
     }, {
+        'field': 'f_is_show1',
+        'element': 'radio',
+        'label': u'类型1',
+        'type': 'str',
+        'option_array': [
+            {'val': '1', 'desc': u'收费1'},
+            {'val': '2', 'desc': u'免费1'},
+            {'val': '3', 'desc': u'优惠活动1'},
+        ],
+        'required': False,
+        'default': '2',
+    }, {
         'field': 'f_supplier',
         'element': 'select',
-        'placeholder': u'供应商',
+        'label': u'供应商',
         'type': 'str',
-        'value_array': ['gewala', 'self', 'manlv'],
-        'desc_array': [u'格瓦拉', u'自营', u'漫旅'],
+        'option_array': [
+            {'val': 'gewala', 'desc': u'格瓦拉'},
+            {'val': 'self', 'desc': u'自营'},
+            {'val': 'manlv', 'desc': u'漫旅'},
+        ],
         'required': False,
         'default': 'self',
+    },{
+        'field': 'f_supplier1',
+        'element': 'select',
+        'label': u'供应商1',
+        'type': 'int',
+        'option_array': [
+            {'val': 1, 'desc': u'格瓦拉1'},
+            {'val': 2, 'desc': u'自营1'},
+            {'val': 3, 'desc': u'漫旅1'},
+        ],
+        'required': False,
+        'default': 3,
     }, {
         'field': 'f_week',
         'element': 'checkbox',
-        'placeholder': u'星期',
-        'value_array': [1, 2, 3, 4, 5, 6, 7],
-        'desc_array': [u'一', u'二', u'三', u'四', u'五', u'六', u'日'],
+        'label': u'星期',
+        'type': 'int',
+        'option_array': [
+            {'val': 1, 'desc': u'一'},
+            {'val': 2, 'desc': u'二'},
+            {'val': 3, 'desc': u'三'},
+            {'val': 4, 'desc': u'四'},
+            {'val': 5, 'desc': u'五'},
+            {'val': 6, 'desc': u'六'},
+            {'val': 7, 'desc': u'日'},
+        ],
         'default': [2, 4],
         'required': False,
-        'type': 'int'
-    }, {
-        'field': 'f_tiny_type',
-        'element': 'checkbox',
-        'placeholder': u'小类型',
-        'value_array': ['1', '2', '3', '4', '5', '6', '7'],
-        'desc_array': [u'一', u'二', u'三', u'四', u'五', u'六', u'日'],
-        'default': ['2', '4'],
-        'required': False,
-        'type': 'str'
-    }
+    },
 ]
 
 
-def generate_view(arg_model_list):
-    loader = template.Loader("templates")
+tpl_suffixes = {
+    'html': ['.htm', 'l'],
+    'handler': ['.p', 'y'],
+    'model': ['.p', 'y'],
+}
 
+
+def __generate_template(tpl_file, arg_model_list, tpl_type="html"):
+    loader = template.Loader("templates")
     build_path = "build"
     build_path_exists = os.path.exists(build_path)
     print(build_path_exists)
     if not build_path_exists:
         os.mkdir(build_path)
 
-    input_file_name = "form_new.htm"
-    view_template = loader.load(input_file_name)
+    input_tpl_file = tpl_file + tpl_suffixes[tpl_type][0]
+    view_template = loader.load(input_tpl_file)
     template_result = view_template.generate(
         model_list=arg_model_list,
-        model_name='project',
-        escape=None,
-    )
-    output_file = open('/'.join([build_path, input_file_name + 'l']), 'w+')
-    output_file.write(template_result)
-    output_file.close()
-
-    input_file_name = "form_edit.htm"
-    view_template = loader.load(input_file_name)
-    template_result = view_template.generate(
-        model_list=arg_model_list,
-        model_name='project',
-        prev="{{",
-        next="}}",
-        escape=None,
-    )
-
-    output_file = open('/'.join([build_path, input_file_name + 'l']), 'w+')
-    output_file.write(template_result)
-    output_file.close()
-
-
-    input_file_name = "handler.p"
-    view_template = loader.load(input_file_name)
-    template_result = view_template.generate(
-        model_list=arg_model_list,
-        model_name='project',
-        model_name_upper='Project',
-        prev="{{",
-        next="}}",
-        escape=None,
-    )
-
-    output_file = open('/'.join([build_path, input_file_name + 'y']), 'w+')
-    output_file.write(template_result)
-    output_file.close()
-
-    input_file_name = "model.p"
-    view_template = loader.load(input_file_name)
-    template_result = view_template.generate(
-        model_list=arg_model_list,
-        model_name='project',
-        model_name_upper='Project',
-        prev="{{",
-        next="}}",
-        escape=None,
-    )
-
-    output_file = open('/'.join([build_path, input_file_name + 'y']), 'w+')
-    output_file.write(template_result)
-    output_file.close()
-
-    input_file_name = "entries.htm"
-    view_template = loader.load(input_file_name)
-    template_result = view_template.generate(
-        model_list=arg_model_list,
-        model_name='project',
-        model_name_upper='Project',
+        model_name='topic',
+        model_name_upper='Topic',
         prev="{{",
         next="}}",
         prev_per="{%",
@@ -138,9 +122,17 @@ def generate_view(arg_model_list):
         escape=None,
     )
 
-    output_file = open('/'.join([build_path, input_file_name + 'l']), 'w+')
+    output_file = open('/'.join([build_path, input_tpl_file + tpl_suffixes[tpl_type][1]]), 'w+')
     output_file.write(template_result)
     output_file.close()
+
+
+def generate_view(arg_model_list):
+    __generate_template('entries', arg_model_list, tpl_type='html')
+    __generate_template('form_edit', arg_model_list, tpl_type='html')
+    __generate_template('form_new', arg_model_list, tpl_type='html')
+    __generate_template('handler', arg_model_list, tpl_type='handler')
+    __generate_template('model', arg_model_list, tpl_type='model')
 
 if __name__ == '__main__':
     generate_view(model_list)

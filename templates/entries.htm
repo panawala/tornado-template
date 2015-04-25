@@ -21,10 +21,9 @@
       <thead>
         <tr>
           <th>#</th>
-          <th>描述</th>
-          <th>类型</th>
-          <th>开始时间</th>
-          <th>结束时间</th>
+          {% for model in model_list %}{% if model['element'] != 'id' %}
+          <th>{{model['label']}}</th>
+          {% end %}{% end %}
           <th>编辑</th>
           <th>删除</th>
         </tr>
@@ -33,9 +32,7 @@
       </tbody>
     </table>
 
-
     <div id="pager"></div>
-
     <div>
         Go to page:
         <select id="page-changed-select">
@@ -93,10 +90,9 @@
               $('#{{model_name}}_body').empty();
               var tmpl_str = '<tr>'
                             +  '<td>${ f_id }</td>'
-                            +  '<td>${ f_title }</td>'
-                            +  '<td>${ f_type }</td>'
-                            +  '<td>${ f_begin_date }</td>'
-                            +  '<td>${ f_end_date }</td>'
+                            {% for model in model_list %}{% if model['element'] != 'id' %}
+                            +  '<td>${ {{model['field']}} }</td>'
+                            {% end %}{% end %}
                             +  '<td><a href="/{{model_name}}s/edit/${ f_id }">编辑</a></td>'
                             +  '<td><a href="javascript:void(0);" onclick="remove_{{model_name}}_body(this)" id="id-${ f_id }" href="#">删除</a></td>'
                             +'</tr>';

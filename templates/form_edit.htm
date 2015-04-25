@@ -1,32 +1,35 @@
 {% autoescape None %}
-<form class="form-horizontal" role="form" method="post" enctype="multipart/form-data" action="/{{model_name}}/new" onsubmit="return checkForm()">
+
+{{prev_per}} extends "base_admin.html" {{next_per}}
+{{prev_per}} block body {{next_per}}
+<form class="form-horizontal" role="form" method="post" action="/{{model_name}}/new">
   <input type="hidden" name="id" value="{{prev}}{{model_name}}.f_id{{next}}">
 {% for model in model_list %}
  {% if model['element'] == 'text' %}
   <div class="form-group">
-    <label for="{{model['field'][2:]}}" class="col-sm-2 control-label">{{model['placeholder']}}</label>
+    <label for="{{model['field'][2:]}}" class="col-sm-2 control-label">{{model['label']}}</label>
     <div class="col-sm-6">
-      <input type="text" class="form-control" value="{{prev}}{{model_name}}.{{model['field']}}{{next}}" id="{{model['field'][2:]}}" name="{{model['field'][2:]}}" placeholder="输入{{model['placeholder']}}（必填）">
+      <input type="text" class="form-control" value="{{prev}}{{model_name}}.{{model['field']}}{{next}}" id="{{model['field'][2:]}}" name="{{model['field'][2:]}}" placeholder="输入{{model['label']}}（必填）">
     </div>
   </div>
   {% elif model['element'] == 'radio' %}
   <div class="form-group">
-    <label class="col-sm-2 control-label">{{model['placeholder']}}</label>
+    <label class="col-sm-2 control-label">{{model['label']}}</label>
     <div class="col-sm-6">
-      {% for i in xrange(len(model['value_array'])) %}
+      {% for i in xrange(len(model['option_array'])) %}
       <label class="radio-inline">
-        <input type="radio" name="{{model['field'][2:]}}" value="{{model['value_array'][i]}}" {{prev}}'checked' if {{model_name}}.{{model['field']}} == {{ "'" + str(model['default']) + "'" if model['type'] == 'str' else int(model['default']) }} else ''{{next}}> {{model['desc_array'][i]}}
+        <input type="radio" name="{{model['field'][2:]}}" value="{{model['option_array'][i]['val']}}" {{prev}}'checked' if {{model_name}}.{{model['field']}} == {{ "'" + str(model['default']) + "'" if model['type'] == 'str' else int(model['default']) }} else ''{{next}}> {{model['option_array'][i]['desc']}}
       </label>
       {% end %}
     </div>
   </div>
   {% elif model['element'] == 'select' %}
   <div class="form-group">
-    <label for="{{model['field'][2:]}}" class="col-sm-2 control-label">{{model['placeholder']}}</label>
+    <label for="{{model['field'][2:]}}" class="col-sm-2 control-label">{{model['label']}}</label>
     <div class="col-sm-6">
       <select class="form-control" id="{{model['field'][2:]}}" name="{{model['field'][2:]}}">
-        {% for i in xrange(len(model['value_array'])) %}
-        <option value="{{model['value_array'][i]}}"  {{prev}}'selected="selected"' if {{model_name}}.{{model['field']}} == {{ "'" + str(model['default']) + "'" if model['type'] == 'str' else int(model['default']) }} else ''{{next}}>{{model['desc_array'][i]}}</option>
+        {% for i in xrange(len(model['option_array'])) %}
+        <option value="{{model['option_array'][i]['val']}}"  {{prev}}'selected="selected"' if {{model_name}}.{{model['field']}} == {{ "'" + str(model['default']) + "'" if model['type'] == 'str' else int(model['default']) }} else ''{{next}}>{{model['option_array'][i]['desc']}}</option>
         {% end %}
       </select>
     </div>
@@ -34,10 +37,10 @@
   {% elif model['element'] == 'checkbox' %}
   <div class="form-group">
     <div class="col-sm-offset-2 col-sm-6 form-inline">
-      <label class="control-label">{{model['placeholder']}}</label>
-      {% for i in xrange(len(model['value_array'])) %}
+      <label class="control-label">{{model['label']}}</label>
+      {% for i in xrange(len(model['option_array'])) %}
       <label class="checkbox-inline">
-        <input type="checkbox" name="{{model['field'][2:]}}" value="{{model['value_array'][i]}}" {{prev}}'checked' if {{model_name}}.{{model['field']}} in {{model['default']}} else ''{{next}}> {{model['desc_array'][i]}}
+        <input type="checkbox" name="{{model['field'][2:]}}" value="{{model['option_array'][i]['val']}}" {{prev}}'checked' if (1 << int({{model['option_array'][i]['val']}})) & {{model_name}}.{{model['field']}} else ''{{next}}> {{model['option_array'][i]['desc']}}
       </label>
       {% end %}
     </div>
@@ -50,3 +53,4 @@
     </div>
   </div>
 </form>
+{{prev_per}} end {{next_per}}
